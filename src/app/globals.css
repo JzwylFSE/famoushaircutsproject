@@ -1,0 +1,12 @@
+@import "tailwindcss";
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+:root {
+  --primary: #000000; /* black => Main text, CTA buttons, footer */
+  --secondary: #8b6220; /* golden-brown => Headings, accents, CTA highlights */
+  --background: #ffffff; /* white => Backgrounds, text on dark */
+  --accent: #f5deb3; /* wheat => Soft section backgrounds, cards */
+}
+
