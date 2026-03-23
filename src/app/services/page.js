@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
 
 const services = [
   {
@@ -65,6 +66,7 @@ const services = [
 
 export default function ServicesPage() {
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+  // const router = useRouter();
 
   return (
     <div
@@ -167,18 +169,16 @@ export default function ServicesPage() {
                   >
                     Duration: {service.duration}
                   </p>
-                  <motion.a
-                    href={`https://wa.me/${whatsappNumber}?text=Hi%2C%20I'd%20like%20to%20book%20a%20${encodeURIComponent(
-                      service.name
+                  <Link
+                    href={`/contact?service=${encodeURIComponent(
+                      `${service.name} (${service.price})`,
                     )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="inline-flex items-center font-medium"
                     style={{ color: "var(--secondary)" }}
-                    whileHover={{ x: 3 }}
+                    aria-label={`Book ${service.name}`}
                   >
                     Book Now <FaArrowRight className="ml-2" />
-                  </motion.a>
+                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -205,20 +205,17 @@ export default function ServicesPage() {
           >
             Ready for Your Transformation?
           </motion.h2>
-          <motion.a
-            href={`https://wa.me/${whatsappNumber}?text=Hi%2C%20I'd%20like%20to%20book%20a%20haircut`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/contact"
             className="px-8 py-3 rounded-md font-bold text-lg inline-block"
             style={{
               backgroundColor: "var(--background)",
               color: "var(--secondary)",
             }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            aria-label="Book Appointment"
           >
             Book Appointment
-          </motion.a>
+          </Link>
         </div>
       </motion.section>
     </div>

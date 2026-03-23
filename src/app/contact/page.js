@@ -11,18 +11,33 @@ import {
   FaCompress,
   FaDirections,
 } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
 
-export default function ContactPage() {
+// 1. We renamed your main component to ContactPageContent
+function ContactPageContent() {
+  const searchParams = useSearchParams();
+  const urlService = searchParams.get("service");
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
     service: "",
+    date: "", 
     message: "",
   });
+
+  // 2. This useEffect perfectly catches the URL and locks it into the dropdown
+  useEffect(() => {
+    if (urlService) {
+      setForm((prev) => ({ ...prev, service: urlService }));
+    }
+  }, [urlService]);
+
   const [isMapExpanded, setIsMapExpanded] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.id]: e.target.value });
@@ -30,8 +45,24 @@ export default function ContactPage() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    const text = `Hello, my name is ${form.name}%0AService: ${form.service}%0APhone: ${form.phone}%0AMessage: ${form.message}`;
+    setIsSubmitting(true);
+
+    try {
+      fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+    } catch (error) {
+      console.error("Background logging failed, proceeding to WhatsApp anyway:", error);
+    }
+
+    const text = `Hello, my name is ${form.name}%0AService: ${form.service}%0ADate: ${form.date}%0APhone: ${form.phone}%0AMessage: ${form.message}`;
+    
     window.open(`https://wa.me/${whatsappNumber}?text=${text}`, "_blank");
+
+    setForm({ name: "", phone: "", service: "", date: "", message: "" });
+    setIsSubmitting(false);
   }
 
   return (
@@ -61,7 +92,7 @@ export default function ContactPage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          Book your appointment or ask us anything - we&apos;re here to help
+          Book your appointment or ask us anything - we're here to help
         </motion.p>
       </motion.section>
 
@@ -144,15 +175,37 @@ export default function ContactPage() {
                   required
                 >
                   <option value="">Select a service</option>
+                  {/* Added Home Service so the dropdown perfectly matches the URL parameter */}
+                  <option>Home Service (₦7000)</option>
                   <option>Classic Haircut (₦5000)</option>
                   <option>Clean Fade (₦3000)</option>
-                  <option>Children&apos;s Cut (₦2000)</option>
-                  <option>Lineup &amp; Beard Trim (₦1500)</option>
+                  <option>Children's Cut (₦2000)</option>
+                  <option>Lineup & Beard Trim (₦1500)</option>
                   <option>Hair Colouring (₦1500)</option>
                   <option>Hair Design (₦2000)</option>
                   <option>Hair Treatment (₦1500)</option>
                 </select>
               </div>
+
+              <div>
+                <label
+                  htmlFor="date"
+                  className="block mb-1"
+                  style={{ color: "var(--primary)" }}
+                >
+                  Preferred Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  id="date"
+                  className="w-full px-4 py-2 rounded border"
+                  style={{ borderColor: "var(--secondary)" }}
+                  required
+                  value={form.date}
+                  onChange={handleChange}
+                />
+              </div>
+
               <div>
                 <label
                   htmlFor="message"
@@ -173,7 +226,8 @@ export default function ContactPage() {
               </div>
               <motion.button
                 type="submit"
-                className="w-full py-3 rounded-md font-bold"
+                disabled={isSubmitting}
+                className="w-full py-3 rounded-md font-bold disabled:opacity-70"
                 style={{
                   backgroundColor: "var(--secondary)",
                   color: "var(--background)",
@@ -181,7 +235,7 @@ export default function ContactPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                Send Message
+                {isSubmitting ? "Redirecting to WhatsApp..." : "Book via WhatsApp"}
               </motion.button>
             </form>
           </motion.div>
@@ -308,7 +362,7 @@ export default function ContactPage() {
         </div>
       </motion.section>
 
-      {/* Enhanced Map Section */}
+      {/* Enhanced Map Section - COMPLETELY UNTOUCHED */}
       <motion.section
         className={`px-4 ${
           isMapExpanded
@@ -414,5 +468,14 @@ export default function ContactPage() {
         </div>
       </motion.section>
     </div>
+  );
+}
+
+// 3. This is the new exported component. It safely wraps everything above!
+export default function ContactPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[var(--background)]"></div>}>
+      <ContactPageContent />
+    </Suspense>
   );
 }

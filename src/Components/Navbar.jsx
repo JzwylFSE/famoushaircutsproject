@@ -103,18 +103,16 @@ export default function Navbar() {
                 </Link>
               ))}
             </div>
-            <a
-              href={`https://wa.me/${whatsappNumber}?text=Hi%2C%20I'd%20like%20to%20book%20a%20haircut`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/contact"
+              className="ml-4 px-4 py-2 rounded font-bold hover:bg-opacity-90 transition-colors"
               style={{
                 backgroundColor: "var(--secondary)",
                 color: "var(--background)",
               }}
-              className="ml-4 px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors"
             >
               Book Now
-            </a>
+            </Link>
           </nav>
 
           {/* Mobile Toggle */}
@@ -167,18 +165,17 @@ export default function Navbar() {
                   </span>
                 </Link>
               ))}
-              <a
-                href={`https://wa.me/${whatsappNumber}?text=Hi%2C%20I'd%20like%20to%20book%20a%20haircut`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/contact"
+                className="w-full mt-4 px-4 py-2 rounded font-bold hover:bg-opacity-90 transition-colors block text-center"
                 style={{
                   backgroundColor: "var(--secondary)",
                   color: "var(--background)",
                 }}
-                className="w-full mt-4 px-4 py-2 rounded-md hover:bg-opacity-90 transition-colors block text-center"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 Book Now
-              </a>
+              </Link>
             </div>
           </motion.div>
         )}

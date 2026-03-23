@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { FaHome, FaCamera, FaQuoteLeft } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
 
 const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 
@@ -69,7 +70,7 @@ export default function Home() {
 
     intervalRef.current = setInterval(() => {
       setCurrentTestimonial((prev) =>
-        prev === testimonials.length - 1 ? 0 : prev + 1
+        prev === testimonials.length - 1 ? 0 : prev + 1,
       );
     }, 3000);
 
@@ -79,13 +80,13 @@ export default function Home() {
 
   const nextTestimonial = () => {
     setCurrentTestimonial((prev) =>
-      prev === testimonials.length - 1 ? 0 : prev + 1
+      prev === testimonials.length - 1 ? 0 : prev + 1,
     );
   };
 
   const prevTestimonial = () => {
     setCurrentTestimonial((prev) =>
-      prev === 0 ? testimonials.length - 1 : prev - 1
+      prev === 0 ? testimonials.length - 1 : prev - 1,
     );
   };
 
@@ -144,16 +145,8 @@ export default function Home() {
           >
             Discover iconic styles and trends.
           </motion.p>
-          {/* Book Now button */}
-          <motion.a
-            href={`https://wa.me/${whatsappNumber}?text=Hi%2C%20I&apos;d%20like%20to%20book%20a%20haircut`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2 sm:px-6 sm:py-3 rounded text-base sm:text-lg font-semibold inline-block"
-            style={{
-              backgroundColor: "var(--secondary)",
-              color: "var(--white)",
-            }}
+          {/* Book Now button (internal redirect to /contact) */}
+          <motion.div
             whileHover={{
               scale: 1.05,
               boxShadow: "0 4px 16px 0 var(--secondary)",
@@ -163,8 +156,17 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.9, duration: 0.5 }}
           >
-            Book Now
-          </motion.a>
+            <Link
+              href="/contact"
+              className="px-4 py-2 sm:px-6 sm:py-3 rounded text-base sm:text-lg font-semibold inline-block"
+              style={{
+                backgroundColor: "var(--secondary)",
+                color: "var(--white)",
+              }}
+            >
+              Book Now
+            </Link>
+          </motion.div>
         </div>
       </motion.section>
 
