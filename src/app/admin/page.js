@@ -15,7 +15,7 @@ import {
   FaSyncAlt,
   FaSignOutAlt
 } from "react-icons/fa";
-import Button1 from "@/components/Button1"; // Importing the reusable Button1
+import Button1 from "./../../Components/Button1";
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

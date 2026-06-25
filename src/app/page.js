@@ -5,8 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaHome, FaCamera, FaQuoteLeft } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
-import Button1 from "@/components/Button1";
-import Button2 from "@/components/Button2";
+
+import Button1 from "@/Components/Button1";
+import Button2 from "@/Components/Button2";
 
 const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 

@@ -6,7 +6,7 @@ import Image from "next/image";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { FaHeart, FaRegHeart, FaInstagram } from "react-icons/fa";
-import Button2 from "@/components/Button2";
+import Button2 from "./../../Components/Button2";
 
 const galleryItems = [
   // categories: All, Transformation, Beard, Coloring, Fade, Design, Kids, Service

@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Button2 from "@/components/Button2";
+import Button2 from "./../../Components/Button2";
 
 const MotionButton2 = motion(Button2);
 const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";

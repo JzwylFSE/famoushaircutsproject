@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { FaQuoteLeft, FaInstagram } from "react-icons/fa";
 import Link from "next/link";
-import Button2 from "@/components/Button2";
+import Button2 from "./../../Components/Button2";
 
 const testimonials = [
   {

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
-import Button2 from "@/components/Button2";
+import Button2 from "./../../Components/Button2";
 
 const services = [
   {
