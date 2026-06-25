@@ -6,6 +6,7 @@ import Image from "next/image";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { FaHeart, FaRegHeart, FaInstagram } from "react-icons/fa";
+import Button2 from "@/components/Button2";
 
 const galleryItems = [
   // categories: All, Transformation, Beard, Coloring, Fade, Design, Kids, Service
@@ -47,7 +48,7 @@ const galleryItems = [
   {
     id: 6,
     src: "/images/22.2.jpg",
-    alt: "Taper fade backvieww",
+    alt: "Taper fade backview",
     description: "High level taper fade",
     category: "fade",
   },
@@ -251,8 +252,8 @@ export default function GalleryPage() {
   const toggleLike = (id) => {
     setGallery(
       gallery.map((item) =>
-        item.id === id ? { ...item, liked: !item.liked } : item
-      )
+        item.id === id ? { ...item, liked: !item.liked } : item,
+      ),
     );
   };
 
@@ -262,43 +263,37 @@ export default function GalleryPage() {
       : gallery.filter((item) =>
           Array.isArray(item.category)
             ? item.category.includes(activeFilter.toLowerCase())
-            : item.category === activeFilter.toLowerCase()
+            : item.category === activeFilter.toLowerCase(),
         );
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: "var(--background)" }}
-    >
-      {/* Hero Header */}
+    <div className="min-h-screen bg-[#0a0a0a]">
+      {/* --- Hero Header --- */}
       <motion.section
-        className="py-20 px-4 text-center"
+        className="pt-32 pb-12 px-4 text-center"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
         <motion.h1
-          className="text-4xl md:text-5xl font-bold mb-4"
-          style={{ color: "var(--secondary)" }}
-          initial={{ y: -20 }}
-          animate={{ y: 0 }}
+          className="text-4xl md:text-6xl font-serif font-bold mb-4 text-[#d4af37] tracking-wider uppercase"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
         >
           Gallery
         </motion.h1>
         <motion.p
-          className="text-lg max-w-2xl mx-auto mb-6"
-          style={{ color: "var(--primary)" }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="text-xs sm:text-sm md:text-base max-w-2xl mx-auto text-zinc-400 uppercase tracking-[0.2em]"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          Witness the <b>artistry</b> of Famous Haircuts through our
-          transformations and haircuts
+          Witness the artistry and precision of Famous Haircuts
         </motion.p>
       </motion.section>
 
-      {/* Filter Buttons */}
-      <div className="flex flex-wrap justify-center gap-3 px-4 pb-8">
+      {/* --- Filter Buttons --- */}
+      <div className="flex flex-wrap justify-center gap-4 md:gap-8 px-4 pb-12 max-w-5xl mx-auto">
         {[
           "All",
           "Transformation",
@@ -309,88 +304,75 @@ export default function GalleryPage() {
           "Kids",
           "Service",
         ].map((cat) => (
-          <motion.button
+          <button
             key={cat}
-            className={`px-4 py-2 rounded-full text-sm font-medium ${
-              activeFilter === cat ? "active-filter" : ""
+            className={`text-xs md:text-sm uppercase tracking-widest pb-1 transition-all duration-300 border-b-2 ${
+              activeFilter === cat
+                ? "text-[#d4af37] border-[#d4af37] font-bold"
+                : "text-zinc-500 border-transparent hover:text-zinc-300 hover:border-zinc-700"
             }`}
-            style={{
-              backgroundColor:
-                activeFilter === cat ? "var(--secondary)" : "transparent",
-              color:
-                activeFilter === cat ? "var(--background)" : "var(--primary)",
-              border: `1px solid var(--${
-                activeFilter === cat ? "secondary" : "primary"
-              })`,
-            }}
-            whileHover={{
-              backgroundColor: "var(--secondary)",
-              color: "var(--background)",
-            }}
             onClick={() => setActiveFilter(cat)}
           >
             {cat}
-          </motion.button>
+          </button>
         ))}
       </div>
 
-      {/* Gallery Grid */}
-      <div className="columns-1 md:columns-2 lg:columns-4 gap-3 px-4">
+      {/* --- Gallery Grid (3 Columns on Mobile) --- */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 md:gap-4 px-1 md:px-4 max-w-[1400px] mx-auto mb-24">
         {filteredItems.map((item, idx) => (
           <motion.div
             key={item.id}
-            className="mb-3 relative group break-inside-avoid"
+            className="relative group cursor-pointer aspect-square bg-zinc-900 overflow-hidden"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: (idx % 10) * 0.05 }}
             viewport={{ once: true }}
+            onClick={() => {
+              setIndex(idx);
+              setOpen(true);
+            }}
           >
-            <div
-              className="rounded-lg overflow-hidden relative cursor-zoom-in"
-              onClick={() => {
-                setIndex(idx);
-                setOpen(true);
-              }}
-            >
-              <div className="aspect-[4/5] relative">
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
+            <Image
+              src={item.src}
+              alt={item.alt}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
+            />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                <h3 className="text-xl font-bold mb-2 text-white line-clamp-2">
-                  {item.alt}
-                </h3>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs px-2 py-1 rounded text-white bg-black/50">
-                    #{item.category}
-                  </span>
-                  <button
-                    className="text-white"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleLike(item.id);
-                    }}
-                  >
-                    {item.liked ? (
-                      <FaHeart className="text-red-500" />
-                    ) : (
-                      <FaRegHeart />
-                    )}
-                  </button>
-                </div>
-              </div>
+            {/* Hover Glass Overlay */}
+            <div className="absolute inset-0 bg-[#0a0a0a]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-2 md:p-4 text-center">
+              <h3 className="text-xs md:text-lg font-serif font-bold text-white line-clamp-2 md:line-clamp-none">
+                {item.alt}
+              </h3>
+              <span className="hidden md:block text-[#d4af37] text-[10px] md:text-xs uppercase tracking-widest mt-2">
+                #
+                {Array.isArray(item.category)
+                  ? item.category[0]
+                  : item.category}
+              </span>
+
+              {/* Like Button */}
+              <button
+                className="absolute bottom-2 right-2 md:bottom-4 md:right-4 text-white hover:scale-110 transition-transform"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleLike(item.id);
+                }}
+              >
+                {item.liked ? (
+                  <FaHeart className="text-red-500 text-sm md:text-xl" />
+                ) : (
+                  <FaRegHeart className="text-sm md:text-xl" />
+                )}
+              </button>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Lightbox */}
+      {/* --- Lightbox --- */}
       <Lightbox
         open={open}
         close={() => setOpen(false)}
@@ -401,57 +383,63 @@ export default function GalleryPage() {
           description: item.description,
         }))}
         styles={{
-          container: { backgroundColor: "rgba(0, 0, 0, 0.9)" },
-          icon: { color: "var(--background)" },
+          container: { backgroundColor: "rgba(10, 10, 10, 0.95)" },
+          icon: { color: "#ffffff" },
         }}
         render={{
           slide: ({ slide }) => (
-            <div className="relative w-full h-full">
-              <Image
-                src={slide.src}
-                alt={slide.alt}
-                fill
-                className="w-full h-full object-contain"
-                sizes="100vw"
-                priority
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-center bg-gradient-to-t from-black/80 to-transparent">
-                <h3 className="text-xl font-bold text-white">{slide.alt}</h3>
-                <p className="text-white/80">{slide.description}</p>
+            <div className="relative w-full h-full flex items-center justify-center p-4 md:p-10">
+              <div className="relative w-full max-w-4xl h-full">
+                <Image
+                  src={slide.src}
+                  alt={slide.alt}
+                  fill
+                  className="object-contain"
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-center bg-gradient-to-t from-[#0a0a0a] to-transparent">
+                <h3 className="text-xl md:text-2xl font-serif font-bold text-[#d4af37] mb-2">
+                  {slide.alt}
+                </h3>
+                <p className="text-zinc-300 font-light text-sm md:text-base tracking-wide uppercase">
+                  {slide.description}
+                </p>
               </div>
             </div>
           ),
           iconNext: () => (
-            <div className="p-2 rounded-full bg-black/50 hover:bg-black/70 transition">
+            <div className="p-3 rounded-full bg-[#0a0a0a]/50 hover:bg-[#d4af37] transition-colors border border-zinc-800 hover:border-[#d4af37] group">
               <svg
                 viewBox="0 0 24 24"
                 width="24"
                 height="24"
-                fill="var(--background)"
+                className="fill-white group-hover:fill-[#0a0a0a]"
               >
                 <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
               </svg>
             </div>
           ),
           iconPrev: () => (
-            <div className="p-2 rounded-full bg-black/50 hover:bg-black/70 transition">
+            <div className="p-3 rounded-full bg-[#0a0a0a]/50 hover:bg-[#d4af37] transition-colors border border-zinc-800 hover:border-[#d4af37] group">
               <svg
                 viewBox="0 0 24 24"
                 width="24"
                 height="24"
-                fill="var(--background)"
+                className="fill-white group-hover:fill-[#0a0a0a]"
               >
                 <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z" />
               </svg>
             </div>
           ),
           iconClose: () => (
-            <div className="p-2 rounded-full bg-black/50 hover:bg-black/70 transition">
+            <div className="p-3 rounded-full bg-[#0a0a0a]/50 hover:bg-red-500 transition-colors border border-zinc-800 hover:border-red-500 group">
               <svg
                 viewBox="0 0 24 24"
                 width="24"
                 height="24"
-                fill="var(--background)"
+                className="fill-white group-hover:fill-white"
               >
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
               </svg>
@@ -460,46 +448,31 @@ export default function GalleryPage() {
         }}
       />
 
-      {/* Instagram CTA */}
+      {/* --- Instagram CTA --- */}
       <motion.section
-        className="py-16 px-4 text-center"
-        style={{ backgroundColor: "var(--accent)" }}
+        className="py-24 px-4 text-center bg-zinc-950 border-t border-zinc-900"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
       >
         <div className="container mx-auto max-w-4xl">
-          <FaInstagram
-            className="text-4xl mx-auto mb-6"
-            style={{ color: "var(--secondary)" }}
-          />
-          <motion.h2
-            className="text-3xl font-bold mb-4"
-            style={{ color: "var(--primary)" }}
-          >
+          <FaInstagram className="text-5xl mx-auto mb-6 text-[#d4af37]" />
+          <h2 className="text-3xl md:text-5xl font-serif text-white mb-6">
             Show Us Your Cut
-          </motion.h2>
-          <motion.p
-            className="text-lg mb-8 max-w-2xl mx-auto"
-            style={{ color: "var(--primary)" }}
-          >
-            Tag @FamousHaircuts to be featured in our gallery!
-          </motion.p>
-          <motion.a
+          </h2>
+          <p className="text-zinc-400 text-sm md:text-base uppercase tracking-widest mb-10 max-w-2xl mx-auto">
+            Tag <span className="text-[#d4af37]">@Famous_Haircut01</span> to be
+            featured in our gallery!
+          </p>
+          <Button2
             href="https://www.instagram.com/famous_haircut01/"
+            className="inline-flex items-center gap-3"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-3 rounded-md font-bold text-lg inline-flex items-center gap-2"
-            style={{
-              backgroundColor: "var(--secondary)",
-              color: "var(--background)",
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
-            Follow Us <FaInstagram />
-          </motion.a>
+            Follow Us <FaInstagram className="text-lg" />
+          </Button2>
         </div>
       </motion.section>
     </div>

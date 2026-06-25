@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa";
 import Image from "next/image";
 import Link from "next/link";
+import Button2 from "@/components/Button2";
 
 const services = [
   {
@@ -31,7 +32,7 @@ const services = [
     name: "Children's Cut",
     price: "₦2000",
     desc: "Gentle cuts designed for young clients with fun styles",
-    image: "/images/",
+    image: "/images/", // Note: Ensure you have a valid image path here or it will show empty
     duration: "35mins",
   },
   {
@@ -45,7 +46,7 @@ const services = [
     name: "Hair Colouring",
     price: "₦1500",
     desc: "Professional coloring for vibrant or natural looks",
-    image: "/images/",
+    image: "/images/", // Note: Ensure you have a valid image path here
     duration: "1hr",
   },
   {
@@ -65,120 +66,108 @@ const services = [
 ];
 
 export default function ServicesPage() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
-  // const router = useRouter();
-
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: "var(--background)" }}
-    >
-      {/* Hero Section */}
+    <div className="min-h-screen bg-[#0a0a0a]">
+      {/* --- Hero Section --- */}
       <motion.section
-        className="py-20 px-4 text-center"
+        className="pt-32 pb-16 px-4 text-center relative"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
         <motion.h1
-          className="text-4xl md:text-5xl font-bold mb-4"
-          style={{ color: "var(--secondary)" }}
-          initial={{ y: -20 }}
-          animate={{ y: 0 }}
-          transition={{ delay: 0.2 }}
+          className="text-4xl md:text-6xl font-serif font-bold mb-6 text-[#d4af37] tracking-wider uppercase"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.8 }}
         >
           Our Services
         </motion.h1>
         <motion.p
-          className="text-lg max-w-2xl mx-auto"
-          style={{ color: "var(--primary)" }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto text-zinc-400 uppercase tracking-[0.2em]"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
         >
           Precision cuts and treatments tailored to your unique style
         </motion.p>
       </motion.section>
 
-      {/* Services Grid */}
+      {/* --- Services Grid --- */}
       <motion.section
-        className="pb-20 px-4"
+        className="pb-24 px-4"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
       >
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-10">
             {services.map((service, index) => (
               <motion.div
                 key={service.name}
-                className="rounded-lg overflow-hidden shadow-lg"
-                style={{
-                  backgroundColor: "var(--accent)",
-                  border: "2px solid var(--secondary)",
-                }}
+                className="group rounded-xl overflow-hidden bg-zinc-900/30 border border-zinc-800 hover:border-[#d4af37]/50 transition-all duration-500"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true, margin: "-50px" }}
-                whileHover={{ y: -5 }}
+                whileHover={{
+                  y: -8,
+                  boxShadow: "0 15px 30px -10px rgba(212, 175, 55, 0.1)",
+                }}
               >
                 {/* Service Image */}
-                <div className="h-48 bg-gray-200 relative overflow-hidden">
-                  <Image
-                    src={service.image}
-                    alt={service.name}
-                    fill
-                    style={{ objectFit: "cover" }}
-                    sizes="(max-width: 768px) 100vw,
-                           (max-width: 1200px) 50vw,
-                           33vw"
-                    priority={index === 0}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                  <div className="w-full h-full flex items-center justify-center text-6xl z-10 relative">
-                    {service.icon}
-                  </div>
+                <div className="h-56 bg-zinc-900 relative overflow-hidden">
+                  {service.image && service.image !== "/images/" ? (
+                    <Image
+                      src={service.image}
+                      alt={service.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority={index < 3}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-zinc-700 font-serif italic text-sm">
+                      Image coming soon
+                    </div>
+                  )}
+                  {/* Dark Gradient Overlay for readability if text was over it, and luxury feel */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent opacity-90"></div>
                 </div>
 
                 {/* Service Content */}
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3
-                      className="text-xl font-bold"
-                      style={{ color: "var(--primary)" }}
-                    >
+                <div className="p-8 relative bg-[#0a0a0a]">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-bold text-white uppercase tracking-wider">
                       {service.name}
                     </h3>
-                    <span
-                      className="px-3 py-1 rounded-full text-sm font-bold"
-                      style={{
-                        backgroundColor: "var(--secondary)",
-                        color: "var(--background)",
-                      }}
-                    >
+                    <span className="text-xl font-serif font-bold text-[#d4af37]">
                       {service.price}
                     </span>
                   </div>
-                  <p className="mb-4" style={{ color: "var(--primary)" }}>
+
+                  <p className="mb-6 text-zinc-400 font-light leading-relaxed min-h-[3rem]">
                     {service.desc}
                   </p>
-                  <p
-                    className="mb-4 text-sm font-semibold"
-                    style={{ color: "var(--tertiary)" }}
-                  >
-                    Duration: {service.duration}
-                  </p>
-                  <Link
-                    href={`/contact?service=${encodeURIComponent(
-                      `${service.name} (${service.price})`,
-                    )}`}
-                    className="inline-flex items-center font-medium"
-                    style={{ color: "var(--secondary)" }}
-                    aria-label={`Book ${service.name}`}
-                  >
-                    Book Now <FaArrowRight className="ml-2" />
-                  </Link>
+
+                  <div className="flex justify-between items-center border-t border-zinc-800/50 pt-6">
+                    <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
+                      Duration:{" "}
+                      <span className="text-white">{service.duration}</span>
+                    </p>
+
+                    {/* Interactive Book Now Link */}
+                    <Link
+                      href={`/contact?service=${encodeURIComponent(
+                        `${service.name} (${service.price})`,
+                      )}`}
+                      className="inline-flex items-center text-xs font-bold text-[#d4af37] uppercase tracking-widest hover:text-white transition-colors duration-300"
+                      aria-label={`Book ${service.name}`}
+                    >
+                      Book Now
+                      <FaArrowRight className="ml-2 transition-transform duration-300 group-hover:translate-x-2" />
+                    </Link>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -186,10 +175,9 @@ export default function ServicesPage() {
         </div>
       </motion.section>
 
-      {/* CTA Section */}
+      {/* --- CTA Section --- */}
       <motion.section
-        className="py-16 px-4 text-center"
-        style={{ backgroundColor: "var(--secondary)" }}
+        className="py-24 px-4 text-center bg-zinc-950 border-t border-zinc-900"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -197,25 +185,17 @@ export default function ServicesPage() {
       >
         <div className="container mx-auto max-w-4xl">
           <motion.h2
-            className="text-3xl font-bold mb-6"
-            style={{ color: "var(--background)" }}
-            initial={{ y: -10 }}
-            whileInView={{ y: 0 }}
-            transition={{ delay: 0.2 }}
+            className="text-3xl md:text-5xl font-serif text-white mb-6"
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
           >
             Ready for Your Transformation?
           </motion.h2>
-          <Link
-            href="/contact"
-            className="px-8 py-3 rounded-md font-bold text-lg inline-block"
-            style={{
-              backgroundColor: "var(--background)",
-              color: "var(--secondary)",
-            }}
-            aria-label="Book Appointment"
-          >
-            Book Appointment
-          </Link>
+          <p className="text-zinc-400 mb-10 uppercase tracking-widest text-sm">
+            Secure your slot and experience the standard.
+          </p>
+          <Button2 href="/contact">Book Appointment</Button2>
         </div>
       </motion.section>
     </div>
