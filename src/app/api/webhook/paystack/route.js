@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key');
 
 // Use a Service Role Key here to bypass RLS since this is a backend webhook
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -47,25 +47,24 @@ export async function POST(req) {
         return NextResponse.json({ message: "Database error" }, { status: 500 });
       }
 
-      // 2. Trigger Resend Email Microservice
+      // 2. Trigger Resend Email Microservice (ADMIN ALERT)
       try {
         await resend.emails.send({
-          from: 'Famous Haircuts <onboarding@resend.dev>', // Should use verified domain in production
-          to: customer.email,
-          subject: 'Appointment Confirmed - Famous Haircuts',
+          from: 'Famous Haircuts System <onboarding@resend.dev>',
+          to: 'cjsimeon090@gmail.com', // MUST MATCH YOUR RESEND ACCOUNT EMAIL
+          subject: '💰 New Booking Paid - Famous Haircuts',
           html: `
             <div style="font-family: Arial, sans-serif; max-w: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
-              <h1 style="color: #B8860B; text-align: center;">FAMOUS HAIRCUTS</h1>
-              <h2 style="color: #333;">Booking Confirmed</h2>
-              <p>Hello,</p>
-              <p>Your payment of <strong>₦${amount / 100}</strong> was successful. Your appointment has been confirmed!</p>
+              <h1 style="color: #B8860B; text-align: center;">FAMOUS HAIRCUTS ALERTS</h1>
+              <h2 style="color: #333;">You just got paid!</h2>
+              <p>A client has successfully booked and paid <strong>₦${amount / 100}</strong>.</p>
               <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <p><strong>Client Email:</strong> ${customer.email}</p>
                 <p><strong>Reference:</strong> ${reference}</p>
-                <p><strong>Date & Time:</strong> ${new Date(appointment_date).toLocaleString()}</p>
-                <p><strong>Location:</strong> Elekahia Housing Estate, Port Harcourt</p>
+                <p><strong>Appointment Date:</strong> ${new Date(appointment_date).toLocaleString()}</p>
+                <p><strong>Client Message:</strong> ${message || 'None'}</p>
               </div>
-              <p>If you have any questions, please contact us on WhatsApp: +234 814 971 3412.</p>
-              <p>We look forward to seeing you!</p>
+              <p>Check your Live Queue in the Admin Dashboard for full details.</p>
             </div>
           `
         });
