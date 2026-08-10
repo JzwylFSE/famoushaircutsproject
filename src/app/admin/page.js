@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 import { 
   FaCalendarAlt, 
   FaUser, 
@@ -17,36 +18,49 @@ import {
 } from "react-icons/fa";
 import Button1 from "./../../Components/Button1";
 
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export default function AdminPage() {
+  const supabase = createClient();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passcode, setPasscode] = useState("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [authError, setAuthError] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // --- SIMPLE AUTHENTICATION ---
-  const ADMIN_PASSCODE = process.env.NEXT_PUBLIC_ADMIN_PASSCODE;
-
-  function handleLogin(e) {
-    e.preventDefault();
-    if (passcode === ADMIN_PASSCODE) {
-      setIsAuthenticated(true);
-      fetchAppointments();
-    } else {
-      alert("Incorrect Security Passcode");
-      setPasscode("");
+  // --- AUTHENTICATION CHECK ---
+  useEffect(() => {
+    async function checkAdminAuth() {
+      setIsCheckingAuth(true);
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error || !user) {
+          setAuthError("You are not logged in.");
+          setIsAuthenticated(false);
+        } else if (user.email === 'cjsimeon090@gmail.com') {
+          setIsAuthenticated(true);
+          fetchAppointments();
+        } else {
+          setAuthError("Access Denied: You do not have administrator privileges.");
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        setAuthError("Authentication check failed.");
+      } finally {
+        setIsCheckingAuth(false);
+      }
     }
-  }
+    
+    checkAdminAuth();
+  }, []);
 
   // --- LOGOUT FUNCTION ---
-  function handleLogout() {
+  async function handleLogout() {
+    await supabase.auth.signOut();
     setIsAuthenticated(false);
-    setPasscode("");
     setAppointments([]); // Clears data from memory for security
+    router.push('/login');
   }
 
   // --- 2. FETCH APPOINTMENTS (Relational JOIN) ---
@@ -60,6 +74,8 @@ export default function AdminPage() {
           appointment_date,
           status,
           client_message,
+          amount_paid,
+          payment_reference,
           created_at,
           tbl_clients (full_name, phone_number),
           tbl_services (service_name)
@@ -97,58 +113,76 @@ export default function AdminPage() {
   }
 
   // --- RENDER: LOGIN SCREEN ---
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50">
+         <FaSpinner className="animate-spin text-4xl text-[#B8860B]" />
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-[#0a0a0a] bg-[url('/images/heropic.jpg')] bg-cover bg-center relative">
-        <div className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-sm z-0"></div>
+      <div className="min-h-screen flex items-center justify-center px-4 bg-slate-50 relative">
+        <div className="absolute inset-0 bg-white/40 backdrop-blur-sm z-0"></div>
         
         <motion.div 
-          className="p-10 rounded-xl w-full max-w-md text-center relative z-10 bg-zinc-900/40 border border-zinc-800 backdrop-blur-md shadow-2xl"
+          className="p-10 rounded-xl w-full max-w-md text-center relative z-10 bg-white border border-slate-200 shadow-2xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="w-16 h-16 mx-auto bg-zinc-900 border border-zinc-700 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(212,175,55,0.1)]">
-            <FaLock className="text-2xl text-[#d4af37]" />
+          <div className="w-16 h-16 mx-auto bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center mb-6 shadow-sm">
+            <FaLock className="text-2xl text-[#B8860B]" />
           </div>
           
-          <h2 className="text-2xl font-serif tracking-widest font-bold mb-2 text-white uppercase">Restricted Access</h2>
-          <p className="text-zinc-500 text-xs uppercase tracking-widest mb-8">Admin Authentication Required</p>
+          <h2 className="text-2xl font-serif tracking-widest font-bold mb-2 text-slate-900 uppercase">Restricted Access</h2>
+          <p className="text-slate-500 text-xs uppercase tracking-widest mb-8">Admin Authentication Required</p>
           
-          <form onSubmit={handleLogin} className="space-y-6">
-            <input
-              type="password"
-              placeholder="••••••"
-              className="w-full px-4 py-4 rounded-none border-0 border-b border-zinc-700 bg-zinc-900/50 text-center font-mono text-2xl tracking-[0.5em] text-[#d4af37] focus:ring-0 focus:border-[#d4af37] transition-colors placeholder:text-zinc-700"
-              value={passcode}
-              onChange={(e) => setPasscode(e.target.value)}
-              required
-            />
-            <motion.button
-              type="submit"
-              className="w-full py-4 bg-[#d4af37] text-[#0a0a0a] text-sm uppercase tracking-widest font-bold hover:bg-white transition-colors duration-300"
-              whileTap={{ scale: 0.98 }}
-            >
-              Authenticate
-            </motion.button>
-          </form>
+          <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-md">
+            <p className="text-red-600 text-sm">{authError}</p>
+          </div>
+          
+          <motion.button
+            onClick={() => router.push('/login')}
+            className="w-full py-4 bg-[#B8860B] text-white text-sm uppercase tracking-widest font-bold hover:bg-[#DFB15B] transition-colors duration-300 rounded-sm"
+            whileTap={{ scale: 0.98 }}
+          >
+            Go to Login
+          </motion.button>
         </motion.div>
       </div>
     );
   }
 
+  // --- DATA PROCESSING ---
+  const upcomingAppointments = appointments
+    .filter(app => app.status === 'Pending' || app.status === 'Confirmed' || app.status === 'Paid')
+    .sort((a, b) => new Date(a.appointment_date) - new Date(b.appointment_date));
+
+  const historyAppointments = appointments
+    .filter(app => app.status === 'Completed' || app.status === 'Cancelled');
+
+  const isToday = (dateString) => {
+    const today = new Date();
+    const date = new Date(dateString);
+    return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+  };
+
   // --- RENDER: ADMIN DASHBOARD ---
   return (
-    <div className="min-h-screen py-32 px-4 bg-[#0a0a0a]">
+    <div className="min-h-screen py-32 px-4 bg-slate-50 text-slate-900">
       <div className="container mx-auto max-w-7xl">
         
         {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-12 border-b border-zinc-900 pb-6 gap-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-12 border-b border-slate-200 pb-6 gap-6">
           <div>
-            <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#d4af37] tracking-wider uppercase mb-2">
+            <h1 className="text-3xl md:text-4xl font-serif font-bold text-[#B8860B] tracking-wider uppercase mb-2">
               Admin Dashboard
             </h1>
-            <p className="text-xs text-zinc-500 uppercase tracking-widest">
+            <p className="text-xs text-slate-500 uppercase tracking-widest">
               Live Database Synchronization
             </p>
           </div>
@@ -156,124 +190,197 @@ export default function AdminPage() {
           {/* Top Right Controls */}
           <div className="flex flex-col sm:flex-row items-center gap-4">
             
-            {/* Reusable Button1 for Syncing */}
             <Button1 onClick={fetchAppointments} className="gap-3 px-6 py-3 text-xs">
               {isLoading ? <FaSpinner className="animate-spin" /> : <FaSyncAlt />}
               Refresh Clients
             </Button1>
 
-            {/* Custom Red Danger Button for Logout */}
             <button 
               onClick={handleLogout}
-              className="px-6 py-3 border border-red-600 bg-transparent text-red-600 text-xs uppercase tracking-widest font-bold hover:bg-red-600 hover:text-[#0a0a0a] transition-all duration-300 inline-flex items-center justify-center gap-3 disabled:opacity-50"
+              className="px-6 py-3 border border-red-500 bg-transparent text-red-600 text-xs uppercase tracking-widest font-bold hover:bg-red-500 hover:text-white transition-all duration-300 inline-flex items-center justify-center gap-3 rounded-sm disabled:opacity-50"
               title="Logout"
             >
               <FaSignOutAlt />
               Logout
             </button>
-
           </div>
         </div>
 
-        {/* Appointments Grid */}
         {isLoading ? (
           <div className="text-center py-32">
-            <FaSpinner className="animate-spin text-5xl mx-auto text-[#d4af37] mb-6" />
-            <p className="text-zinc-500 text-xs uppercase tracking-widest">Querying Relational Tables...</p>
-          </div>
-        ) : appointments.length === 0 ? (
-          <div className="text-center py-32 bg-zinc-900/30 border border-zinc-800 rounded-xl">
-            <p className="text-zinc-500 text-sm uppercase tracking-widest">No Active Appointments Found in Database.</p>
+            <FaSpinner className="animate-spin text-5xl mx-auto text-[#B8860B] mb-6" />
+            <p className="text-slate-500 text-xs uppercase tracking-widest">Querying Relational Tables...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            <AnimatePresence>
-              {appointments.map((app) => (
-                <motion.div
-                  key={app.appointment_id}
-                  className="p-8 rounded-xl bg-zinc-900/50 border border-zinc-800 relative flex flex-col justify-between"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  layout
-                >
-                  {/* Status Badge (Luxury Neon Style) */}
-                  <div 
-                    className={`absolute top-6 right-6 px-3 py-1 text-[10px] font-bold uppercase tracking-widest border ${
-                      app.status === 'Pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                      app.status === 'Confirmed' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                      app.status === 'Cancelled' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 
-                      'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
-                    }`}
-                  >
-                    {app.status}
+          <>
+            {/* LIVE QUEUE SECTION */}
+            {upcomingAppointments.length > 0 && (
+              <div className="mb-16">
+                <h2 className="text-xl font-serif font-bold text-slate-800 mb-6 flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                  Live Queue
+                </h2>
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse min-w-[800px]">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-widest text-slate-500">
+                          <th className="p-4 font-semibold">Time</th>
+                          <th className="p-4 font-semibold">Client</th>
+                          <th className="p-4 font-semibold">Service</th>
+                          <th className="p-4 font-semibold">Paid</th>
+                          <th className="p-4 font-semibold">Status</th>
+                          <th className="p-4 font-semibold text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <AnimatePresence>
+                          {upcomingAppointments.map((app) => {
+                            const today = isToday(app.appointment_date);
+                            return (
+                              <motion.tr 
+                                key={app.appointment_id}
+                                layout
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className={`border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors ${today ? 'bg-[#B8860B]/5' : ''}`}
+                              >
+                                <td className="p-4">
+                                  <div className="flex flex-col">
+                                    <span className={`font-semibold ${today ? 'text-[#B8860B]' : 'text-slate-900'}`}>
+                                      {new Date(app.appointment_date).toLocaleTimeString('en-NG', { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                    <span className="text-xs text-slate-500">
+                                      {today ? "Today" : new Date(app.appointment_date).toLocaleDateString('en-NG', { month: 'short', day: 'numeric' })}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="p-4">
+                                  <div className="font-serif text-sm font-medium text-slate-900">{app.tbl_clients?.full_name}</div>
+                                  <a href={`tel:${app.tbl_clients?.phone_number}`} className="text-xs text-slate-500 hover:text-[#B8860B] transition-colors">{app.tbl_clients?.phone_number}</a>
+                                </td>
+                                <td className="p-4 text-sm text-slate-700">{app.tbl_services?.service_name}</td>
+                                <td className="p-4">
+                                  <span className="text-sm font-medium text-slate-900">
+                                    {app.amount_paid ? `₦${parseInt(app.amount_paid).toLocaleString()}` : 'N/A'}
+                                  </span>
+                                </td>
+                                <td className="p-4">
+                                  <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest border rounded-full ${
+                                    app.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                    app.status === 'Paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                    'bg-green-50 text-green-700 border-green-200'
+                                  }`}>
+                                    {app.status}
+                                  </span>
+                                </td>
+                                <td className="p-4 text-right">
+                                  {(app.status === 'Pending' || app.status === 'Paid') && (
+                                    <div className="flex justify-end gap-2">
+                                      <button onClick={() => updateStatus(app.appointment_id, 'Confirmed')} className="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors" title="Confirm">
+                                        <FaCheckCircle className="text-lg" />
+                                      </button>
+                                      <button onClick={() => updateStatus(app.appointment_id, 'Cancelled')} className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Cancel">
+                                        <FaTimesCircle className="text-lg" />
+                                      </button>
+                                    </div>
+                                  )}
+                                  {app.status === 'Confirmed' && (
+                                    <button onClick={() => updateStatus(app.appointment_id, 'Completed')} className="px-4 py-2 text-xs uppercase tracking-widest font-bold bg-[#B8860B] text-white hover:bg-[#DFB15B] rounded-sm transition-colors shadow-sm">
+                                      Complete
+                                    </button>
+                                  )}
+                                </td>
+                              </motion.tr>
+                            );
+                          })}
+                        </AnimatePresence>
+                      </tbody>
+                    </table>
                   </div>
+                </div>
+              </div>
+            )}
 
-                  {/* Client Info */}
-                  <div className="mb-8 pr-20">
-                    <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-1">Client</h3>
-                    <p className="text-xl font-serif text-white">{app.tbl_clients?.full_name || "Unknown Identity"}</p>
-                  </div>
-                  
-                  <div className="space-y-4 text-zinc-400 font-light text-sm mb-6">
-                    <div className="flex items-center gap-4">
-                      <FaPhone className="text-[#d4af37]" /> 
-                      <a href={`tel:${app.tbl_clients?.phone_number}`} className="hover:text-white transition-colors">
-                        {app.tbl_clients?.phone_number}
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <FaCut className="text-[#d4af37]" /> 
-                      <span className="text-white">{app.tbl_services?.service_name || "Custom Entry"}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <FaCalendarAlt className="text-[#d4af37]" /> 
-                      <span className="font-semibold text-[#d4af37]">
-                        {new Date(app.appointment_date).toLocaleString('en-NG', {
-                          weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                        })}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Message Block */}
-                  {app.client_message && (
-                    <div className="mb-6 p-4 bg-[#0a0a0a] border border-zinc-800 text-xs text-zinc-500 italic leading-relaxed">
-                      "{app.client_message}"
-                    </div>
-                  )}
-
-                  {/* Action Buttons */}
-                  <div className="mt-auto pt-6 border-t border-zinc-800 flex gap-3">
-                    {app.status === 'Pending' && (
-                      <>
-                        <button 
-                          onClick={() => updateStatus(app.appointment_id, 'Confirmed')}
-                          className="flex-1 py-3 text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-2 bg-green-500/10 text-green-500 border border-green-500/30 hover:bg-green-500 hover:text-[#0a0a0a] transition-all duration-300"
-                        >
-                          <FaCheckCircle /> Confirm
-                        </button>
-                        <button 
-                          onClick={() => updateStatus(app.appointment_id, 'Cancelled')}
-                          className="flex-1 py-3 text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-2 bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500 hover:text-[#0a0a0a] transition-all duration-300"
-                        >
-                          <FaTimesCircle /> Cancel
-                        </button>
-                      </>
-                    )}
-                    {app.status === 'Confirmed' && (
-                      <button 
-                        onClick={() => updateStatus(app.appointment_id, 'Completed')}
-                        className="w-full py-3 text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-3 bg-[#d4af37] text-[#0a0a0a] hover:bg-white transition-all duration-300"
+            {/* HISTORY SECTION */}
+            <h2 className="text-xl font-serif font-bold text-slate-800 mb-6">Appointment History</h2>
+            {historyAppointments.length === 0 ? (
+              <div className="text-center py-16 bg-white border border-slate-200 rounded-xl shadow-sm">
+                <p className="text-slate-500 text-sm uppercase tracking-widest">No Historical Appointments.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                <AnimatePresence>
+                  {historyAppointments.map((app) => (
+                    <motion.div
+                      key={app.appointment_id}
+                      className="p-8 rounded-xl bg-white border border-slate-100 shadow-sm relative flex flex-col justify-between"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      layout
+                    >
+                      <div 
+                        className={`absolute top-6 right-6 px-3 py-1 text-[10px] font-bold uppercase tracking-widest border rounded-full ${
+                          app.status === 'Cancelled' ? 'bg-red-50 text-red-700 border-red-200' : 
+                          'bg-slate-100 text-slate-600 border-slate-200'
+                        }`}
                       >
-                        <FaCheckCircle /> Mark as Completed
-                      </button>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+                        {app.status}
+                      </div>
+
+                      <div className="mb-8 pr-20">
+                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Client</h3>
+                        <p className="text-xl font-serif text-[#111827]">{app.tbl_clients?.full_name || "Unknown Identity"}</p>
+                      </div>
+                      
+                      <div className="space-y-4 text-slate-600 font-light text-sm mb-6">
+                        <div className="flex items-center gap-4">
+                          <FaPhone className="text-[#B8860B]" /> 
+                          <a href={`tel:${app.tbl_clients?.phone_number}`} className="hover:text-[#B8860B] transition-colors">
+                            {app.tbl_clients?.phone_number}
+                          </a>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <FaCut className="text-[#B8860B]" /> 
+                          <span className="text-[#111827]">{app.tbl_services?.service_name || "Custom Entry"}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <FaCalendarAlt className="text-[#B8860B]" /> 
+                          <span className="font-semibold text-[#B8860B]">
+                            {new Date(app.appointment_date).toLocaleString('en-NG', {
+                              weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Financial Data */}
+                      <div className="mb-6 p-4 bg-slate-50 border border-slate-100 rounded-md text-sm">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Amount Paid</span>
+                          <span className="font-bold text-slate-900">{app.amount_paid ? `₦${parseInt(app.amount_paid).toLocaleString()}` : 'N/A'}</span>
+                        </div>
+                        {app.payment_reference && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Ref</span>
+                            <span className="text-xs text-slate-400 font-mono">{app.payment_reference}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {app.client_message && (
+                        <div className="mt-auto p-4 bg-slate-50 border border-slate-100 rounded-md text-xs text-slate-600 italic leading-relaxed">
+                          "{app.client_message}"
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

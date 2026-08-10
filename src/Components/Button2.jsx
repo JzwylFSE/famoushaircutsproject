@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Button2({ href, children, className = "", ...props }) {
   // Base luxury styling: Filled -> Outline
   const baseStyles =
-    "px-8 py-4 border border-[#d4af37] bg-[#d4af37] text-[#0a0a0a] text-sm uppercase tracking-widest font-bold hover:bg-transparent hover:text-[#d4af37] transition-all duration-300 inline-flex items-center justify-center text-center disabled:opacity-50 disabled:cursor-not-allowed";
+    "px-8 py-4 border border-textmain bg-transparent text-textmain text-sm uppercase tracking-widest font-bold hover:bg-primary hover:border-primary hover:text-white transition-all duration-300 inline-flex items-center justify-center text-center disabled:opacity-50 disabled:cursor-not-allowed rounded-md";
   
   const combinedClassName = `${baseStyles} ${className}`;
 

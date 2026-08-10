@@ -1,7 +1,7 @@
 module.exports = {
   content: [
-    './app/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}'
+    './src/app/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}'
   ],
   theme: {
     extend: {
@@ -9,7 +9,13 @@ module.exports = {
         primary: 'var(--primary)',
         secondary: 'var(--secondary)',
         background: 'var(--background)',
-        accent: 'var(--accent)',
+        surface: 'var(--surface)',
+        textmain: 'var(--text-main)',
+        textmuted: 'var(--text-muted)'
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
       }
     },
   },

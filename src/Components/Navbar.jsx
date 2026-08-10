@@ -3,16 +3,35 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaBars, FaTimes, FaHome, FaImages, FaStar, FaPhone } from "react-icons/fa";
+import { FaBars, FaTimes, FaHome, FaImages, FaStar, FaPhone, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { GiScissors } from "react-icons/gi";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/client";
+import { logout } from "@/app/auth/actions"; 
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState(null);
 
-  // Detect scroll for Glassmorphism effect
+  const supabase = createClient();
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    
+    getSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -21,7 +40,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Lock body scroll when mobile menu is open to prevent background scrolling
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -34,7 +52,6 @@ export default function Navbar() {
     { name: "Home", icon: <FaHome />, href: "/" },
     { name: "Services", icon: <GiScissors />, href: "/services" },
     { name: "Gallery", icon: <FaImages />, href: "/gallery" },
-    { name: "Testimonials", icon: <FaStar />, href: "/testimonials" },
     { name: "Contact", icon: <FaPhone />, href: "/contact" },
   ];
 
@@ -45,21 +62,19 @@ export default function Navbar() {
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={`fixed w-full top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-[#0a0a0a]/90 backdrop-blur-md border-b border-zinc-800 shadow-xl py-3"
+          ? "bg-surface/90 backdrop-blur-md border-b border-gray-200 shadow-sm py-3"
           : "bg-transparent py-4 sm:py-6"
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
           
-          {/* Brand Logo - Fluid Scaling & No Wrapping */}
           <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-            <span className="text-xl sm:text-2xl md:text-3xl cursor-pointer font-serif tracking-widest font-bold text-[#d4af37] whitespace-nowrap">
-              FAMOUS<span className="text-white font-light">HAIRCUTS</span>
+            <span className="text-xl sm:text-2xl md:text-3xl cursor-pointer font-serif font-bold text-textmain whitespace-nowrap">
+              FAMOUS<span className="font-light text-primary">HAIRCUTS</span>
             </span>
           </Link>
 
-          {/* Desktop Nav - Hidden on Mobile/Tablet, Flex on Laptop+ (lg) */}
           <nav className="hidden lg:flex items-center space-x-5 xl:space-x-8">
             <div className="flex space-x-5 xl:space-x-8">
               {navLinks.map((link) => {
@@ -69,13 +84,12 @@ export default function Navbar() {
                   <Link href={link.href} key={link.name}>
                     <span 
                       className={`text-xs xl:text-sm uppercase tracking-widest font-semibold transition-colors duration-300 cursor-pointer relative group ${
-                        isActive ? "text-[#d4af37]" : "text-zinc-300 hover:text-[#d4af37]"
+                        isActive ? "text-primary" : "text-textmuted hover:text-primary"
                       }`}
                     >
                       {link.name}
-                      {/* Sub-line animation */}
                       <span 
-                        className={`absolute -bottom-2 left-0 h-[1px] bg-[#d4af37] transition-all duration-300 ${
+                        className={`absolute -bottom-2 left-0 h-[2px] bg-primary transition-all duration-300 ${
                           isActive ? "w-full" : "w-0 group-hover:w-full"
                         }`}
                       ></span>
@@ -85,18 +99,43 @@ export default function Navbar() {
               })}
             </div>
             
-            {/* Isolated CTA Button */}
-            <Link
-              href="/contact"
-              className="ml-4 xl:ml-6 px-5 xl:px-8 py-3 border border-[#d4af37] bg-transparent text-[#d4af37] text-xs uppercase tracking-widest font-bold hover:bg-[#d4af37] hover:text-[#0a0a0a] transition-all duration-300"
-            >
-              Book Now
-            </Link>
+            {user ? (
+              <div className="flex items-center space-x-4 ml-4 xl:ml-6">
+                <Link
+                  href="/dashboard"
+                  className="text-primary font-serif italic text-lg tracking-wide hover:text-secondary transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <form action={logout}>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 border border-textmain text-textmain text-xs uppercase tracking-widest font-bold hover:bg-primary hover:border-primary hover:text-white transition-all duration-300 rounded-md"
+                  >
+                    Logout
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4 ml-4 xl:ml-6">
+                <Link
+                  href="/login"
+                  className="text-textmain hover:text-primary text-sm font-medium transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/contact"
+                  className="px-6 py-3 bg-transparent border border-textmain text-textmain text-xs uppercase tracking-widest font-bold hover:bg-primary hover:border-primary hover:text-white transition-all duration-300 rounded-md"
+                >
+                  Book Now
+                </Link>
+              </div>
+            )}
           </nav>
 
-          {/* Mobile/Tablet Toggle Button */}
           <button
-            className="lg:hidden text-[#d4af37] hover:text-white transition-colors focus:outline-none p-2"
+            className="lg:hidden text-textmain hover:text-primary transition-colors focus:outline-none p-2"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle Menu"
           >
@@ -109,7 +148,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown - Scrollable & Full Cover */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -117,7 +155,7 @@ export default function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="lg:hidden absolute top-full left-0 w-full bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-zinc-800 shadow-2xl overflow-y-auto max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)]"
+            className="lg:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-gray-200 shadow-2xl overflow-y-auto max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)]"
           >
             <div className="container mx-auto px-4 py-6 sm:py-8 flex flex-col space-y-2 sm:space-y-4">
               {navLinks.map((link) => {
@@ -129,25 +167,55 @@ export default function Navbar() {
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`flex items-center px-4 py-4 rounded-xl transition-all duration-300 uppercase tracking-widest text-sm sm:text-base font-semibold cursor-pointer ${
                         isActive 
-                          ? "text-[#d4af37] bg-zinc-900/60 border border-zinc-800"
-                          : "text-zinc-300 hover:text-[#d4af37] hover:bg-zinc-900/40 border border-transparent"
+                          ? "text-primary bg-primary/5 border border-primary/20"
+                          : "text-textmuted hover:text-primary hover:bg-surface border border-transparent"
                       }`}
                     >
-                      <span className="mr-4 text-xl sm:text-2xl text-[#d4af37]">{link.icon}</span>
+                      <span className="mr-4 text-xl sm:text-2xl text-primary">{link.icon}</span>
                       {link.name}
                     </span>
                   </Link>
                 );
               })}
               
-              <div className="pt-6 mt-4 border-t border-zinc-800/50">
-                <Link
-                  href="/contact"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block w-full py-4 bg-[#d4af37] text-[#0a0a0a] text-center font-bold uppercase tracking-widest text-sm sm:text-base hover:bg-white transition-colors rounded-md"
-                >
-                  Book Appointment
-                </Link>
+              <div className="pt-6 mt-4 border-t border-gray-100 flex flex-col gap-4">
+                {user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center px-4 py-4 rounded-xl text-textmain hover:text-primary hover:bg-surface border border-transparent font-semibold uppercase tracking-widest text-sm"
+                    >
+                      <FaUser className="mr-4 text-xl text-primary" /> Dashboard
+                    </Link>
+                    <form action={logout} className="w-full">
+                      <button
+                        type="submit"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full flex items-center px-4 py-4 rounded-xl text-red-500 hover:bg-red-50 border border-transparent font-semibold uppercase tracking-widest text-sm"
+                      >
+                        <FaSignOutAlt className="mr-4 text-xl text-red-500" /> Logout
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full py-4 text-primary text-center font-bold uppercase tracking-widest text-sm sm:text-base border-2 border-primary hover:bg-primary/5 transition-colors rounded-md"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/contact"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block w-full py-4 bg-transparent border border-textmain text-textmain text-center font-bold uppercase tracking-widest text-sm sm:text-base hover:bg-primary hover:border-primary hover:text-white transition-colors rounded-md"
+                    >
+                      Book Appointment
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
