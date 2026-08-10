@@ -6,8 +6,8 @@ import { NextResponse } from 'next/server';
 const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key');
 
 // Use a Service Role Key here to bypass RLS since this is a backend webhook
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy_key';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(req) {
