@@ -67,8 +67,8 @@ export default function Home() {
             className="object-cover opacity-20"
             priority
           />
-          {/* Light gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-surface/80 via-background/90 to-background z-10" />
+          {/* Dark cinematic gradient overlay for better contrast */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-background z-10" />
         </div>
 
         <div className="relative z-20 flex flex-col items-center w-full mt-16 max-w-4xl text-center">
@@ -76,12 +76,12 @@ export default function Home() {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="mb-4 inline-block px-4 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-medium tracking-widest uppercase"
+            className="mb-6 inline-block px-5 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase"
           >
             Premium Grooming Experience
           </motion.div>
           <motion.h1
-            className="text-5xl sm:text-6xl md:text-8xl font-serif font-bold mb-6 text-textmain tracking-tight leading-tight"
+            className="text-6xl sm:text-7xl md:text-9xl font-serif font-medium mb-6 text-white tracking-tighter leading-none"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
@@ -89,7 +89,7 @@ export default function Home() {
             Famous Haircuts
           </motion.h1>
           <motion.p
-            className="text-lg sm:text-xl mb-10 max-w-2xl text-textmuted font-light leading-relaxed"
+            className="text-lg sm:text-xl md:text-2xl mb-12 max-w-2xl text-slate-200 font-light leading-relaxed tracking-wide"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
@@ -105,13 +105,13 @@ export default function Home() {
           >
             <Link 
               href="/contact" 
-              className="bg-primary text-white font-medium px-8 py-4 rounded-md hover:bg-secondary transition-all duration-300 shadow-lg hover:shadow-primary/30 hover:-translate-y-1"
+              className="bg-[#B8860B] text-white font-bold uppercase tracking-[0.2em] text-xs px-10 py-5 rounded-sm hover:bg-[#DFB15B] transition-all duration-300 shadow-xl hover:shadow-[#B8860B]/30 hover:-translate-y-1"
             >
               Book Appointment
             </Link>
             <Link 
               href="/gallery" 
-              className="border-2 border-primary text-primary font-medium px-8 py-4 rounded-md hover:bg-primary hover:text-white transition-all duration-300"
+              className="border border-white/50 bg-white/5 backdrop-blur-sm text-white font-bold uppercase tracking-[0.2em] text-xs px-10 py-5 rounded-sm hover:bg-white hover:text-black transition-all duration-300"
             >
               View Portfolio
             </Link>
@@ -125,15 +125,15 @@ export default function Home() {
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        viewport={{ once: true, margin: "-100px" }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-serif text-textmain mb-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-6xl font-serif font-medium text-textmain mb-6 tracking-tight">
               Signature Services
             </h2>
-            <div className="w-20 h-1 bg-primary mx-auto mb-6 rounded-full"></div>
-            <p className="text-textmuted text-lg font-light max-w-2xl mx-auto">
+            <div className="w-16 h-[2px] bg-primary mx-auto mb-8"></div>
+            <p className="text-textmuted text-lg md:text-xl font-light max-w-2xl mx-auto tracking-wide">
               Precision cuts tailored to your unique structure and style.
             </p>
           </div>

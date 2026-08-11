@@ -43,12 +43,24 @@ export default async function SignupPage({ searchParams }) {
           required
         />
 
+        <label className="text-sm font-medium mt-2 uppercase tracking-wider text-textmuted" htmlFor="phone_number">
+          Phone Number
+        </label>
+        <input
+          className="rounded-md px-4 py-3 bg-surface border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary mb-4"
+          name="phone_number"
+          type="tel"
+          placeholder="+234 800 000 0000"
+          required
+        />
+
         <label className="text-sm font-medium mt-2 uppercase tracking-wider text-textmuted" htmlFor="email">
           Email
         </label>
         <input
           className="rounded-md px-4 py-3 bg-surface border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary mb-4"
           name="email"
+          type="email"
           placeholder="you@example.com"
           required
         />

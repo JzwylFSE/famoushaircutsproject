@@ -71,64 +71,68 @@ export default async function DashboardPage() {
           </div>
 
           {/* Appointments Section */}
-          <div className="md:col-span-2">
-            <div className="bg-surface border border-gray-200 rounded-xl p-6 shadow-sm mb-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-serif font-semibold flex items-center gap-2">
-                  <FaCalendarAlt className="text-primary" /> Upcoming Appointments
+          <div className="md:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* UPCOMING APPOINTMENTS */}
+            <div className="bg-surface border border-gray-200 rounded-xl p-6 shadow-sm h-fit">
+              <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+                <h2 className="text-lg font-serif font-semibold flex items-center gap-2">
+                  <FaCalendarAlt className="text-primary" /> Upcoming
                 </h2>
               </div>
               
               {!appointments || appointments.filter(a => a.status !== 'Completed').length === 0 ? (
                 <div className="text-center py-10 bg-background rounded-lg border border-dashed border-gray-300">
-                  <p className="text-textmuted mb-4">You have no upcoming appointments.</p>
-                  <Link href="/contact" className="text-primary font-medium hover:underline">
+                  <p className="text-textmuted text-sm mb-4">No upcoming appointments.</p>
+                  <Link href="/contact" className="text-primary text-sm font-medium hover:underline">
                     Book one now
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {appointments.filter(a => a.status !== 'Completed').map((apt) => (
-                    <div key={apt.appointment_id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-background border border-gray-100 rounded-lg hover:border-primary/30 transition-colors">
-                      <div>
-                        <p className="font-semibold text-lg">{apt.tbl_services?.service_name}</p>
-                        <p className="text-textmuted text-sm">{new Date(apt.appointment_date).toLocaleString()}</p>
-                      </div>
-                      <div className="mt-4 sm:mt-0 text-right">
-                        <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold uppercase tracking-wider rounded-full mb-1">
+                    <div key={apt.appointment_id} className="flex flex-col p-4 bg-background border border-gray-100 rounded-lg hover:border-primary/30 transition-colors">
+                      <div className="flex justify-between items-start mb-2">
+                        <p className="font-semibold">{apt.tbl_services?.service_name}</p>
+                        <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-[10px] font-semibold uppercase tracking-wider rounded-md">
                           {apt.status}
                         </span>
-                        <p className="font-medium text-sm">Ref: {apt.payment_reference?.slice(0,8)}...</p>
                       </div>
+                      <p className="text-textmuted text-sm mb-2">{new Date(apt.appointment_date).toLocaleString('en-NG', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                      <p className="font-medium text-xs text-gray-500">Ref: <span className="font-mono">{apt.payment_reference?.slice(0,8)}</span></p>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            <div className="bg-surface border border-gray-200 rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-serif font-semibold flex items-center gap-2">
+            {/* APPOINTMENT HISTORY */}
+            <div className="bg-surface border border-gray-200 rounded-xl p-6 shadow-sm h-fit">
+              <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+                <h2 className="text-lg font-serif font-semibold flex items-center gap-2">
                   <FaHistory className="text-textmuted" /> History
                 </h2>
               </div>
               
               {!appointments || appointments.filter(a => a.status === 'Completed').length === 0 ? (
-                <p className="text-textmuted text-sm">No completed appointments found.</p>
+                <div className="text-center py-10 bg-background rounded-lg border border-dashed border-gray-300">
+                  <p className="text-textmuted text-sm">No completed appointments yet.</p>
+                </div>
               ) : (
                 <div className="space-y-3">
                   {appointments.filter(a => a.status === 'Completed').map((apt) => (
                     <div key={apt.appointment_id} className="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
                       <div>
-                        <p className="font-medium">{apt.tbl_services?.service_name}</p>
+                        <p className="font-medium text-sm">{apt.tbl_services?.service_name}</p>
                         <p className="text-textmuted text-xs">{new Date(apt.appointment_date).toLocaleDateString()}</p>
                       </div>
-                      <p className="font-medium text-sm">₦{apt.amount_paid}</p>
+                      <p className="font-medium text-sm text-green-600">₦{apt.amount_paid}</p>
                     </div>
                   ))}
                 </div>
               )}
             </div>
+
           </div>
 
         </div>

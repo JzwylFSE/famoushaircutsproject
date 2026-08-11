@@ -8,7 +8,11 @@ import {
   FaInstagram,
   FaLock,
   FaCheckCircle,
-  FaSpinner
+  FaSpinner,
+  FaDirections,
+  FaCompress,
+  FaExpand,
+  FaChevronDown
 } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -37,6 +41,8 @@ export default function ContactForm() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const supabase = createClient();
+
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
 
   // Booking Flow States
   const [isProcessing, setIsProcessing] = useState(false);
@@ -247,20 +253,25 @@ export default function ContactForm() {
                   <label htmlFor="serviceId" className="block mb-2 text-xs uppercase tracking-widest text-textmuted font-semibold">
                     Select Service
                   </label>
-                  <select
-                    id="serviceId"
-                    className="w-full px-4 py-3 bg-background border border-gray-200 text-textmain rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors appearance-none"
-                    value={form.serviceId}
-                    onChange={(e) => setForm({ ...form, serviceId: e.target.value })}
-                    required
-                  >
-                    <option value="" disabled>Choose a signature service</option>
-                    {SERVICES.map(s => (
-                      <option key={s.id} value={s.id}>
-                        {s.name} - ₦{s.price.toLocaleString()}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      id="serviceId"
+                      className="w-full px-4 py-3 pr-10 bg-background border border-gray-200 text-textmain rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors appearance-none cursor-pointer"
+                      value={form.serviceId}
+                      onChange={(e) => setForm({ ...form, serviceId: e.target.value })}
+                      required
+                    >
+                      <option value="" disabled>Choose a signature service</option>
+                      {SERVICES.map(s => (
+                        <option key={s.id} value={s.id}>
+                          {s.name} - ₦{s.price.toLocaleString()}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-textmuted">
+                      <FaChevronDown className="text-sm" />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="relative">
@@ -294,16 +305,16 @@ export default function ContactForm() {
 
                 <div className="pt-4 mt-8 border-t border-gray-100 flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-textmuted uppercase tracking-widest font-semibold">Total Deposit</p>
-                    <p className="text-3xl font-serif font-bold text-textmain">₦{amountToPay.toLocaleString()}</p>
+                    <p className="text-xs text-textmuted uppercase tracking-widest font-semibold mb-1">Total Deposit</p>
+                    <p className="text-3xl font-sans font-bold text-textmain tracking-normal">₦{amountToPay.toLocaleString()}</p>
                   </div>
                   <motion.button
                     type="submit"
-                    className="px-8 py-4 bg-transparent border border-textmain text-textmain font-bold uppercase tracking-widest text-sm rounded-md shadow-sm hover:bg-primary hover:border-primary hover:text-white hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-8 py-4 bg-[#B8860B] border border-[#B8860B] text-white font-bold uppercase tracking-widest text-sm rounded-sm shadow-sm hover:bg-[#DFB15B] hover:border-[#DFB15B] transition-all duration-300 disabled:bg-gray-200 disabled:border-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed"
                     whileTap={{ scale: 0.98 }}
                     disabled={amountToPay === 0 || isProcessing}
                   >
-                    {isProcessing ? "Processing..." : "Pay & Book"}
+                    {isProcessing ? "Processing..." : amountToPay === 0 ? "Select Service" : "Pay & Book"}
                   </motion.button>
                 </div>
               </form>
@@ -392,8 +403,115 @@ export default function ContactForm() {
                   </div>
                 </div>
               </div>
+              
             </div>
           </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Enhanced Map Section */}
+      <motion.section
+        className={`w-full ${
+          isMapExpanded
+            ? "fixed inset-0 z-50 bg-black/90 p-0"
+            : "relative py-12 px-4"
+        }`}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <div className={`w-full ${isMapExpanded ? "h-full" : ""}`}>
+          <div
+            className={`relative w-full ${
+              isMapExpanded ? "h-full" : "h-64 sm:h-80 md:h-96 lg:h-[500px]"
+            } rounded-xl overflow-hidden shadow-xl`}
+          >
+            {/* Map Iframe */}
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!4v1751297670936!6m8!1m7!1sjWekXspCg2W8szRpQoJ_yw!2m2!1d4.823071742629652!2d7.026558577574137!3f313.0157594936708!4f1.803797468354432!5f0.4000000000000002"
+              width="100%"
+              height="100%"
+              style={{
+                border: 0,
+                borderRadius: "1rem",
+                boxShadow: "0 2px 16px 0 rgba(0,0,0,0.07)",
+                display: "block",
+              }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Famous Haircuts Street View"
+            />
+
+            {/* Map Controls */}
+            <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 flex gap-2 sm:gap-3">
+              <motion.a
+                href="https://www.google.com/maps/dir/?api=1&destination=4.8230717,7.0265586"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 sm:p-3 rounded-full flex items-center justify-center text-sm sm:text-base"
+                style={{
+                  backgroundColor: "var(--secondary)",
+                  color: "var(--background)",
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                title="Get Directions"
+              >
+                <FaDirections />
+              </motion.a>
+
+              <motion.button
+                onClick={() => setIsMapExpanded(!isMapExpanded)}
+                className="p-2 sm:p-3 rounded-full flex items-center justify-center text-sm sm:text-base"
+                style={{
+                  backgroundColor: "var(--secondary)",
+                  color: "var(--background)",
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                title={isMapExpanded ? "Minimize Map" : "Expand Map"}
+              >
+                {isMapExpanded ? <FaCompress /> : <FaExpand />}
+              </motion.button>
+            </div>
+
+            {/* Location Card */}
+            <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-white p-3 sm:p-4 rounded-lg shadow-md max-w-xs">
+              <h3 className="font-bold text-sm sm:text-base flex items-center gap-2">
+                <FaMapMarkerAlt style={{ color: "var(--secondary)" }} />
+                Famous Haircuts
+              </h3>
+              <p className="text-xs sm:text-sm mt-1">
+                Elekahia Housing Estate, Port Harcourt
+              </p>
+              <a
+                href="https://www.google.com/maps?q=4.8230717,7.0265586"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs sm:text-sm mt-2 inline-block"
+                style={{ color: "var(--secondary)" }}
+              >
+                View on Google Maps →
+              </a>
+            </div>
+          </div>
+
+          {isMapExpanded && (
+            <motion.button
+              onClick={() => setIsMapExpanded(false)}
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 sm:p-3 rounded-full"
+              style={{
+                backgroundColor: "var(--secondary)",
+                color: "var(--background)",
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <FaCompress className="text-sm sm:text-base" />
+            </motion.button>
+          )}
         </div>
       </motion.section>
     </div>

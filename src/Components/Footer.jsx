@@ -12,7 +12,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="w-full py-16 px-4 bg-[#0a0a0a] border-t border-zinc-900">
+    <footer className="w-full py-16 px-4 bg-[#0B192C] border-t border-white/10">
       <div className="container mx-auto max-w-6xl">
         
         {/* Main Footer Content */}
@@ -27,7 +27,7 @@ export default function Footer() {
                 </span>
               </Link>
             </motion.div>
-            <p className="text-zinc-400 font-light leading-relaxed mb-8 max-w-xs">
+            <p className="text-blue-100/70 font-light leading-relaxed mb-8 max-w-xs">
               Precision cuts for the modern gentleman. Elevating grooming standards since 2018.
             </p>
             
@@ -65,7 +65,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="text-xl p-3 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center transition-colors duration-300"
+                  className="text-xl p-3 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-colors duration-300"
                   style={{ color: social.color }}
                   whileHover={{ 
                     y: -5, 
@@ -86,7 +86,7 @@ export default function Footer() {
             <h3 className="text-sm font-semibold mb-6 text-white uppercase tracking-widest">
               Contact Us
             </h3>
-            <ul className="space-y-4 text-zinc-400 font-light">
+            <ul className="space-y-4 text-blue-100/70 font-light">
               <li className="flex items-center justify-center md:justify-start group cursor-pointer hover:text-[#d4af37] transition-colors duration-300">
                 <FaMapMarkerAlt className="mr-4 text-[#d4af37]" />
                 <span>Elekahia Housing Estate, PH</span>
@@ -115,7 +115,7 @@ export default function Footer() {
               ].map((item, index) => (
                 <li
                   key={index}
-                  className="flex justify-between items-center text-zinc-400 font-light border-b border-zinc-800/50 pb-2"
+                  className="flex justify-between items-center text-blue-100/70 font-light border-b border-white/10 pb-2"
                 >
                   <span className="text-white">{item.day}</span>
                   <span className={item.hours === "Closed" ? "text-[#d4af37] font-semibold tracking-wider uppercase text-xs" : ""}>
@@ -129,7 +129,7 @@ export default function Footer() {
         </div>
 
         {/* Copyright Section */}
-        <div className="pt-8 border-t border-zinc-900 text-center flex flex-col md:flex-row justify-between items-center text-xs uppercase tracking-widest text-zinc-600">
+        <div className="pt-8 border-t border-white/10 text-center flex flex-col md:flex-row justify-between items-center text-xs uppercase tracking-widest text-blue-100/50">
           <p className="mb-4 md:mb-0">
             © 2026 Famous Haircuts. All Rights Reserved.
           </p>
@@ -137,7 +137,7 @@ export default function Footer() {
             Designed by{" "}
             <a
               href="https://www.instagram.com/iam_jzwyl/"
-              className="text-zinc-400 hover:text-[#d4af37] transition-colors font-semibold"
+              className="text-blue-100/70 hover:text-[#d4af37] transition-colors font-semibold"
               target="_blank"
               rel="noopener noreferrer"
             >

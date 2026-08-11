@@ -9,28 +9,24 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { logout } from "@/app/auth/actions"; 
 
-export default function Navbar() {
+export default function Navbar({ initialUser }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(initialUser);
 
   const supabase = createClient();
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-    };
-    
-    getSession();
+    // Sync with server state changes from revalidatePath
+    setUser(initialUser);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  }, [initialUser, supabase.auth]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,8 +57,8 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-surface/90 backdrop-blur-md border-b border-gray-200 shadow-sm py-3"
+        isScrolled || isMobileMenuOpen
+          ? `bg-surface/80 backdrop-blur-lg shadow-sm py-3 ${isMobileMenuOpen ? 'border-none' : 'border-b border-gray-200'}`
           : "bg-transparent py-4 sm:py-6"
       }`}
     >
@@ -110,7 +106,7 @@ export default function Navbar() {
                 <form action={logout}>
                   <button
                     type="submit"
-                    className="px-5 py-2 border border-textmain text-textmain text-xs uppercase tracking-widest font-bold hover:bg-primary hover:border-primary hover:text-white transition-all duration-300 rounded-md"
+                    className="px-5 py-2 border-2 border-red-500 text-red-500 text-xs uppercase tracking-widest font-bold hover:bg-red-500 hover:text-white transition-all duration-300 rounded-md"
                   >
                     Logout
                   </button>
@@ -155,7 +151,7 @@ export default function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="lg:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-xl border-b border-gray-200 shadow-2xl overflow-y-auto max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)]"
+            className="lg:hidden absolute top-full left-0 w-full bg-surface/80 backdrop-blur-lg border-b border-gray-200 shadow-2xl overflow-y-auto max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)]"
           >
             <div className="container mx-auto px-4 py-6 sm:py-8 flex flex-col space-y-2 sm:space-y-4">
               {navLinks.map((link) => {

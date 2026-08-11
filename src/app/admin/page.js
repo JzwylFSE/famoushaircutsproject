@@ -190,18 +190,12 @@ export default function AdminPage() {
           {/* Top Right Controls */}
           <div className="flex flex-col sm:flex-row items-center gap-4">
             
-            <Button1 onClick={fetchAppointments} className="gap-3 px-6 py-3 text-xs">
+            <button 
+              onClick={fetchAppointments} 
+              className="px-6 py-3 bg-[#B8860B] text-white text-xs uppercase tracking-widest font-bold hover:bg-[#DFB15B] transition-all duration-300 inline-flex items-center justify-center gap-3 rounded-sm disabled:opacity-50"
+            >
               {isLoading ? <FaSpinner className="animate-spin" /> : <FaSyncAlt />}
               Refresh Clients
-            </Button1>
-
-            <button 
-              onClick={handleLogout}
-              className="px-6 py-3 border border-red-500 bg-transparent text-red-600 text-xs uppercase tracking-widest font-bold hover:bg-red-500 hover:text-white transition-all duration-300 inline-flex items-center justify-center gap-3 rounded-sm disabled:opacity-50"
-              title="Logout"
-            >
-              <FaSignOutAlt />
-              Logout
             </button>
           </div>
         </div>
@@ -275,14 +269,14 @@ export default function AdminPage() {
                                     {app.status}
                                   </span>
                                 </td>
-                                <td className="p-4 text-right">
+                                <td className="p-4 text-right min-w-[180px]">
                                   {(app.status === 'Pending' || app.status === 'Paid') && (
                                     <div className="flex justify-end gap-2">
-                                      <button onClick={() => updateStatus(app.appointment_id, 'Confirmed')} className="p-2 text-green-600 hover:bg-green-50 rounded-md transition-colors" title="Confirm">
-                                        <FaCheckCircle className="text-lg" />
+                                      <button onClick={() => updateStatus(app.appointment_id, 'Confirmed')} className="px-3 py-2 text-[10px] uppercase tracking-widest font-bold bg-green-600 text-white hover:bg-green-700 rounded-sm transition-all shadow-sm active:scale-95">
+                                        Confirm
                                       </button>
-                                      <button onClick={() => updateStatus(app.appointment_id, 'Cancelled')} className="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors" title="Cancel">
-                                        <FaTimesCircle className="text-lg" />
+                                      <button onClick={() => updateStatus(app.appointment_id, 'Cancelled')} className="px-3 py-2 text-[10px] uppercase tracking-widest font-bold bg-red-600 text-white hover:bg-red-700 rounded-sm transition-all shadow-sm active:scale-95">
+                                        Cancel
                                       </button>
                                     </div>
                                   )}
@@ -363,9 +357,9 @@ export default function AdminPage() {
                           <span className="font-bold text-slate-900">{app.amount_paid ? `₦${parseInt(app.amount_paid).toLocaleString()}` : 'N/A'}</span>
                         </div>
                         {app.payment_reference && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Ref</span>
-                            <span className="text-xs text-slate-400 font-mono">{app.payment_reference}</span>
+                          <div className="flex justify-between items-center gap-2">
+                            <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold whitespace-nowrap">Ref</span>
+                            <span className="text-[10px] text-slate-400 font-mono truncate text-right">{app.payment_reference}</span>
                           </div>
                         )}
                       </div>

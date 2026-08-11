@@ -70,13 +70,13 @@ export default function ServicesPage() {
     <div className="min-h-screen bg-background text-textmain">
       {/* --- Hero Section --- */}
       <motion.section
-        className="pt-32 pb-16 px-4 text-center relative"
+        className="pt-32 pb-20 px-4 text-center relative bg-surface border-b border-gray-100"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
         <motion.h1
-          className="text-4xl md:text-6xl font-serif font-bold mb-6 text-textmain tracking-wider uppercase"
+          className="text-5xl md:text-7xl font-serif font-medium mb-6 text-textmain tracking-tight"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.8 }}
@@ -84,7 +84,7 @@ export default function ServicesPage() {
           Our Services
         </motion.h1>
         <motion.p
-          className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto text-textmuted uppercase tracking-[0.2em] font-medium"
+          className="text-xs sm:text-sm max-w-2xl mx-auto text-primary uppercase tracking-[0.3em] font-bold"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
@@ -109,7 +109,7 @@ export default function ServicesPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: true, amount: 0.1 }}
                 whileHover={{
                   y: -8,
                 }}

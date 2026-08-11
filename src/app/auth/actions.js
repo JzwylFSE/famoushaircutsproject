@@ -33,6 +33,7 @@ export async function signup(formData) {
     options: {
       data: {
         full_name: formData.get('full_name'),
+        phone_number: formData.get('phone_number'),
       }
     }
   }
